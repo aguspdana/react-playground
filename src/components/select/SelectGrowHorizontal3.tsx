@@ -5,19 +5,19 @@ export interface Item {
   name: string;
 }
 
-export interface SelectGrowHorizontalChecklistProps {
+export interface SelectGrowHorizontalProps {
   items: Item[];
   selected: string[];
   setSelected: (ids: string[]) => void;
   maxVisible?: number;
 }
 
-export function SelectGrowHorizontalChecklist({
+export function SelectGrowHorizontal({
   items,
   selected,
   setSelected,
   maxVisible = 3,
-}: SelectGrowHorizontalChecklistProps) {
+}: SelectGrowHorizontalProps) {
   const [showAll, setShowAll] = useState(false);
   const selectedItems = useMemo(() => {
     return selectItems(items, selected);
@@ -49,22 +49,11 @@ export function SelectGrowHorizontalChecklist({
       {(showAll ? selectedItems : selectedItems.slice(0, maxVisible)).map(({ id, name }) => (
         // The drop down is closed when we replace the selected item because
         // we use id as the key.
-        <DropDown
-          key={id}
-          items={items}
-          selected={selected}
-          toggleButton={(isOpen, toggle) => (
-            <Badge
-              onClick={toggle}
-              id={id}
-              name={name}
-              onClose={() => removeSelected(id)}
-              isFocused={isOpen}
-            />
-          )}
-          setSelected={setSelected}
-          keepOpen={false}
-        />
+          <Badge
+            id={id}
+            name={name}
+            onClose={() => removeSelected(id)}
+          />
       ))}
 
       {!showAll && selectedItems.length > maxVisible && (
@@ -101,7 +90,7 @@ export function SelectGrowHorizontalChecklist({
             </button>
           )}
           setSelected={setSelected}
-          keepOpen={true}
+          keepOpen={false}
         />
       )}
     </div>
@@ -350,21 +339,19 @@ function filterItems(items: Item[], probe: string): Item[] {
 interface BadgeProps {
   id: string;
   name: string;
-  onClick?: () => void;
   onClose?: () => void;
   isFocused?: boolean;
 }
 
-function Badge({ name, onClick, onClose, isFocused }: BadgeProps) {
+function Badge({ name, onClose, isFocused }: BadgeProps) {
   return (
     <div className="shrink-0 inline-flex gap-0 items-center">
-      <button
-        onClick={onClick}
-        className={`h-8 inline-flex flex-row gap-2 items-center border ${isFocused ? 'border-amber-400' : 'border-gray-400'} hover:border-amber-400 rounded-full pl-3 pr-7`}
+      <div
+        className={`h-8 inline-flex flex-row gap-2 items-center border ${isFocused ? 'border-amber-400' : 'border-gray-400'} rounded-full pl-3 pr-7`}
       >
         <span className="h-2 w-2 bg-amber-400 rounded-full"></span>
         <span className="whitespace-nowrap">{name}</span>
-      </button>
+      </div>
       {onClose && (
         <div className="w-0">
           <button

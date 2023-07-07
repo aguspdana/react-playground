@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SelectGrowHorizontalChecklist } from './SelectGrowHorizontalChecklist';
+import { SelectGrowHorizontal } from './SelectGrowHorizontal2';
 import {useState} from 'react';
 
 const meta: Meta = {
-  component: SelectGrowHorizontalChecklist,
+  component: SelectGrowHorizontal,
 };
 
-type Story = StoryObj<typeof SelectGrowHorizontalChecklist>;
+type Story = StoryObj<typeof SelectGrowHorizontal>;
 
 export const Primary: Story = {
   args: {
@@ -31,7 +31,7 @@ export const Primary: Story = {
   },
   render: (args) => (() => {
     const [selected, setSelected] = useState<string[]>([]);
-    return <SelectGrowHorizontalChecklist
+    return <SelectGrowHorizontal
       {...args}
       selected={selected}
       setSelected={setSelected}
@@ -98,7 +98,7 @@ export const ManyKinds: Story = {
   },
   render: (args) => (() => {
     const [selected, setSelected] = useState<string[]>([]);
-    return <SelectGrowHorizontalChecklist
+    return <SelectGrowHorizontal
       {...args}
       selected={selected}
       setSelected={setSelected}
