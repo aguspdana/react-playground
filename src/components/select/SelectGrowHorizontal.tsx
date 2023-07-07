@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 export interface Item {
   id: string;
@@ -47,10 +47,12 @@ export function SelectGrowHorizontal({
   return (
     <div className="flex flex-row gap-2">
       {(showAll ? selectedItems : selectedItems.slice(0, maxVisible)).map(({ id, name }) => (
+        // The drop down is closed when we replace the selected item because
+        // we use id as the key.
         <DropDown
           key={id}
           items={unselectedItems}
-          toggleButton={(toggle, isOpen) => (
+          toggleButton={(isOpen, toggle) => (
             <Badge
               onClick={toggle}
               id={id}
@@ -87,7 +89,7 @@ export function SelectGrowHorizontal({
       {unselectedItems.length > 0 && (
         <DropDown
           items={unselectedItems}
-          toggleButton={(toggle, isOpen) => (
+          toggleButton={(isOpen, toggle) => (
             <button
               onClick={toggle}
               className={`h-8 w-8 rounded-full border ${isOpen ? 'border-amber-400' : 'border-gray-400'} hover:border-amber-400`}
@@ -96,6 +98,7 @@ export function SelectGrowHorizontal({
             </button>
           )}
           onSelect={(id) => pushSelected(id)}
+          alwaysOpen={false}
         />
       )}
     </div>
@@ -104,37 +107,37 @@ export function SelectGrowHorizontal({
 
 interface DropDownProps {
   items: Item[],
-  toggleButton: (toggle: () => void, isOpen: boolean) => JSX.Element;
+  toggleButton: (isOpen: boolean, toggle: () => void) => JSX.Element;
   onSelect: (id: string) => void;
+  alwaysOpen?: boolean;
 }
 
 function DropDown({
   items,
   toggleButton,
   onSelect,
+  alwaysOpen,
 }: DropDownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const container = useRef<HTMLDivElement | null>(null);
+  useClickOutside(container, () => setIsOpen(false));
 
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (container.current && e.target && !container.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    window.addEventListener('click', handler);
-    return () => window.removeEventListener('click', handler);
-  }, []);
+  function toggle() {
+    setIsOpen((v) => !v);
+  }
 
   return (
     <div
       ref={container}
       className="relative flex flex-col items-center"
     >
-      {toggleButton(() => setIsOpen(v => !v), isOpen)}
+      {toggleButton(isOpen, toggle)}
 
-      {isOpen && (
-        <DropDownPanel items={items} onSelect={onSelect} />
+      {(isOpen || alwaysOpen) && (
+        <DropDownPanel
+          items={items}
+          onSelect={onSelect}
+        />
       )}
     </div>
   );
@@ -210,7 +213,7 @@ function DropDownPanel({ items, onSelect }: DropDownPanelProps) {
           {filteredItems.map(({ id, name }, index) => (
             <button
               key={id}
-              onClick={() => onSelect(id)}
+              onClick={(e) => { onSelect(id); e.stopPropagation()}}
               className={`shrink-0 w-full h-8 px-2 rounded hover:bg-gray-100 text-left overflow-hidden ${focus === index ? 'bg-gray-100' : ''}`}
             >
               {name}
@@ -220,6 +223,21 @@ function DropDownPanel({ items, onSelect }: DropDownPanelProps) {
       </div>
     </div>
   );
+}
+
+function useClickOutside(
+  container: MutableRefObject<HTMLElement | null>,
+  action: () => void,
+) {
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (container.current && e.target && !container.current.contains(e.target as Node)) {
+        action();
+      }
+    }
+    window.addEventListener('click', handler);
+    return () => window.removeEventListener('click', handler);
+  }, [container, action]);
 }
 
 const matchScore = {
