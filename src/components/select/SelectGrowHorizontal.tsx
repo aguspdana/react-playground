@@ -214,7 +214,7 @@ function DropDownPanel({ items, onSelect }: DropDownPanelProps) {
             <button
               key={id}
               onClick={(e) => { onSelect(id); e.stopPropagation()}}
-              className={`shrink-0 w-full h-8 px-2 rounded hover:bg-gray-100 text-left overflow-hidden ${focus === index ? 'bg-gray-100' : ''}`}
+              className={`shrink-0 w-full h-8 px-2 rounded hover:bg-gray-100 text-left overflow-hidden ${focus === index ? 'outline outline-offset-[-1px] outline-1 outline-gray-200' : ''}`}
             >
               {name}
             </button>

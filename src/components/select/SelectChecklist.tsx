@@ -146,7 +146,7 @@ function DropDownPanel({
                   onChange={() => setSelected(on ? selected.filter((i) => i !== id) : [...selected, id])}
                 />
                 <button
-                  className={`group/button shrink-1 w-full h-8 px-2 flex flex-row gap-2 items-center text-left rounded hover:bg-gray-100 ${i == focus ? 'outline outline-offset-[-1px] outline-1 outline-gray-100' : ''}`}
+                  className={`group/button shrink-1 w-full h-8 px-2 flex flex-row gap-2 items-center text-left rounded hover:bg-gray-100 ${i == focus ? 'outline outline-offset-[-1px] outline-1 outline-gray-200' : ''}`}
                   onClick={() => { setSelected([id]); close(); }}
                 >
                   {name}
