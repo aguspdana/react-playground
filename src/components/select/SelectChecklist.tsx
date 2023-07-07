@@ -9,31 +9,49 @@ interface SelectChecklistProps {
   items: Item[];
   selected: string[];
   setSelected: (ids: string[]) => void;
+  maxDisplayed?: number;
+  align?: 'left' | 'center' | 'right';
 }
 
 export function SelectChecklist({
   items,
   selected,
   setSelected,
+  maxDisplayed = 3,
+  align,
 }: SelectChecklistProps) {
   const [isOpen, setIsOpen] = useState(false);
   const container = useRef<HTMLDivElement | null>(null);
   useClickOutside(container, () => setIsOpen(false));
+  const selectedItems = useMemo(() => {
+    return selectItems(items, selected)
+  }, [items, selected]);
 
   return (
     <div
       ref={container}
-      className="flex flex-col items-center"
+      className={`flex flex-col ${align === 'left' ? 'items-start' : align === 'right' ? 'items-end' : 'items-center'}`}
     >
       <button
         onClick={() => setIsOpen((v) => !v)}
-        className="h-8 px-2 rounded border border-gray-400 hover:border-amber-400"
+        className={`h-8 min-w-[128px] px-2 flex flex-row items-center justify-between gap-2 rounded border ${isOpen ? 'border-amber-400' : 'border-gray-400'} hover:border-amber-400`}
         title={selected.length > 0
           ? selectItems(items, selected).map((i) => i.name).join(',\n')
           : undefined
         }
       >
-        {selected.length > 0 ? `${selected.length} kinds` : 'Select kinds'}
+        <span className="flex flex-row items-center gap-1">
+          <span>
+            {selectedItems.length === 0
+              ? 'Select kinds'
+              : selectedItems.slice(0, maxDisplayed).map((item) => item.name).join(', ')
+            }
+          </span>
+          {selectedItems.length > maxDisplayed && (
+            <span className="text-gray-400">+{selectedItems.length - maxDisplayed} more</span>
+          )}
+        </span>
+        <DropDownIcon />
       </button>
 
       {isOpen && (
@@ -42,6 +60,7 @@ export function SelectChecklist({
           selected={selected}
           setSelected={setSelected}
           close={() => setIsOpen(false)}
+          align={align}
         />
       )}
     </div>
@@ -68,6 +87,7 @@ interface DropDownPanelProps {
   selected: string[];
   setSelected: (ids: string[]) => void;
   close: () => void;
+  align?: 'left' | 'center' | 'right';
 }
 
 function DropDownPanel({
@@ -75,6 +95,7 @@ function DropDownPanel({
   selected,
   setSelected,
   close,
+  align,
 }: DropDownPanelProps) {
   const [filter, setFilter] = useState('');
   const container = useRef<HTMLDivElement | null>(null);
@@ -119,7 +140,7 @@ function DropDownPanel({
 
   return (
     <div
-      className="w-0 h-0 translate-y-1 flex flex-col items-center drop-shadow-lg"
+      className={`w-0 h-0 translate-y-1 flex flex-col ${align === 'left' ? 'items-start' : align === 'right' ? 'items-end' : 'items-center'} drop-shadow-lg`}
     >
       <div
         ref={container}
@@ -179,6 +200,14 @@ function Switch({ value, onChange }: SwitchProps) {
     >
       <div className={`w-4 h-4 rounded-full ${value ? 'bg-amber-400' : 'bg-gray-400'}`}></div>
     </button>
+  );
+}
+
+function DropDownIcon() {
+  return (
+    <svg width="9" height="8" viewBox="0 0 9 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.5 3L4.5 7L8.5 3" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
   );
 }
 

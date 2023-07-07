@@ -27,7 +27,8 @@ export const Primary: Story = {
         id: 'todo',
         name: 'todo',
       },
-    ]
+    ],
+    align: 'left',
   },
   render: (args) => (() => {
     const [selected, setSelected] = useState<string[]>([]);
@@ -94,7 +95,8 @@ export const ManyKinds: Story = {
         id: 'mkjdadoiadca',
         name: 'mkjdadoiadca',
       },
-    ]
+    ],
+    align: 'left',
   },
   render: (args) => (() => {
     const [selected, setSelected] = useState<string[]>([]);
